@@ -5,8 +5,14 @@ use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
 use sdl2::EventPump;
+use specs::{Builder, RunNow, World, WorldExt};
+
+use crate::components::{Position, Renderable, Transform, Velocity};
+
+use crate::systems::RenderingSystem;
 
 pub struct Game {
+    world: World,
     canvas: WindowCanvas,
     events: EventPump,
     pub is_running: bool,
@@ -36,18 +42,44 @@ impl Game {
             .expect("[error]: Could not obtain an EventPump for SDL.");
 
         Game {
+            world: World::new(),
             canvas,
             events,
             is_running: true,
         }
     }
 
+    pub fn init(&mut self) {
+        self.world.register::<Renderable>();
+        self.world.register::<Velocity>();
+        self.world.register::<Position>();
+        self.world.register::<Transform>();
+
+        // TODO: remove after verifying rendering system
+        self.world
+            .create_entity()
+            .with(Transform {
+                r_width: 10,
+                r_height: 10,
+                scale: 1,
+            })
+            .with(Renderable {})
+            .with(Position { x: 25.0, y: 25.0 })
+            .with(Velocity { x: 25.0, y: 25.0 })
+            .build();
+    }
+
     pub fn update(&mut self) {}
 
     pub fn render(&mut self) {
-        self.canvas.set_draw_color(Color::RGB(30, 60, 90));
-        self.canvas.clear();
-        self.canvas.present();
+        let canvas = &mut self.canvas;
+        canvas.clear();
+        canvas.set_draw_color(Color::RGB(30, 50, 80));
+        {
+            let mut rendering_system = RenderingSystem { canvas };
+            rendering_system.run_now(&self.world);
+        }
+        canvas.present();
     }
 
     pub fn process_input(&mut self) {
