@@ -1,7 +1,8 @@
-mod components;
-mod constants;
 mod game;
+mod timer;
 mod systems;
+mod constants;
+mod components;
 
 use crate::constants::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use game::Game;

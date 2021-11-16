@@ -1,2 +1,5 @@
-pub const WINDOW_WIDTH: u32 = 640;
-pub const WINDOW_HEIGHT: u32 = 480;
+pub const WINDOW_WIDTH: u32 = 800;
+pub const WINDOW_HEIGHT: u32 = 600;
+
+pub const FRAMES_PER_SECOND: u32 = 60;
+pub const FRAME_TARGET_TIME: u32 = 1000 / FRAMES_PER_SECOND;

@@ -9,12 +9,21 @@ use specs::{Builder, RunNow, World, WorldExt};
 
 use crate::components::{Position, Renderable, Transform, Velocity};
 
-use crate::systems::RenderingSystem;
+use crate::systems::{
+    RenderingSystem,
+    MovementSystem,
+};
+
+use crate::timer::Timer;
+
+#[derive(Default)]
+pub struct DeltaTime(pub f32);
 
 pub struct Game {
     world: World,
     canvas: WindowCanvas,
     events: EventPump,
+    timer: Timer,
     pub is_running: bool,
 }
 
@@ -41,8 +50,15 @@ impl Game {
             .event_pump()
             .expect("[error]: Could not obtain an EventPump for SDL.");
 
+        let timer = Timer::new(
+            sdl_context
+                .timer()
+                .expect("[error]: Could not initialize timer.")
+        );
+
         Game {
             world: World::new(),
+            timer,
             canvas,
             events,
             is_running: true,
@@ -50,6 +66,10 @@ impl Game {
     }
 
     pub fn init(&mut self) {
+        // NOTE: register resources
+        self.world.insert(DeltaTime(0.05));
+
+        // NOTE: register components
         self.world.register::<Renderable>();
         self.world.register::<Velocity>();
         self.world.register::<Position>();
@@ -61,7 +81,7 @@ impl Game {
             .with(Transform {
                 r_width: 10,
                 r_height: 10,
-                scale: 1,
+                scale: 2,
             })
             .with(Renderable {})
             .with(Position { x: 25.0, y: 25.0 })
@@ -69,7 +89,24 @@ impl Game {
             .build();
     }
 
-    pub fn update(&mut self) {}
+    pub fn update(&mut self) {
+        let (tick, delta) = self.timer.tick();
+        if !tick {
+            return;
+        }
+
+        {
+            let mut dt = self.world.write_resource::<DeltaTime>();
+            *dt = DeltaTime(delta);
+        }
+
+        let timer = &mut self.timer;
+        {
+            let mut movement_system = MovementSystem { timer };
+            movement_system.run_now(&self.world)
+        }
+
+    }
 
     pub fn render(&mut self) {
         let canvas = &mut self.canvas;
