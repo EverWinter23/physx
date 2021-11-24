@@ -1,18 +1,13 @@
-extern crate sdl2;
+pub extern crate sdl2;
 
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::WindowCanvas;
 use sdl2::EventPump;
 use specs::{Builder, RunNow, World, WorldExt};
 
-use crate::components::{Position, Renderable, Transform, Velocity};
+use crate::components::{Player, Position, Renderable, Transform, Velocity};
 
-use crate::systems::{
-    RenderingSystem,
-    MovementSystem,
-};
+use crate::systems::{InputSystem, MovementSystem, RenderingSystem};
 
 use crate::timer::Timer;
 
@@ -53,7 +48,7 @@ impl Game {
         let timer = Timer::new(
             sdl_context
                 .timer()
-                .expect("[error]: Could not initialize timer.")
+                .expect("[error]: Could not initialize timer."),
         );
 
         Game {
@@ -70,6 +65,7 @@ impl Game {
         self.world.insert(DeltaTime(0.05));
 
         // NOTE: register components
+        self.world.register::<Player>();
         self.world.register::<Renderable>();
         self.world.register::<Velocity>();
         self.world.register::<Position>();
@@ -79,23 +75,23 @@ impl Game {
         self.world
             .create_entity()
             .with(Transform {
-                r_width: 10,
-                r_height: 10,
+                r_width: 10f32,
+                r_height: 10f32,
+                radius: 20f32,
                 scale: 2,
             })
             .with(Renderable {})
-            .with(Position { x: 25.0, y: 25.0 })
-            .with(Velocity { x: 25.0, y: 25.0 })
+            .with(Position { x: 30f32, y: 30f32 })
+            .with(Velocity { x: 0f32, y: 0f32 })
             .build();
     }
 
     pub fn update(&mut self) {
         let (tick, delta) = self.timer.tick();
+
         if !tick {
             return;
-        }
-
-        {
+        } else {
             let mut dt = self.world.write_resource::<DeltaTime>();
             *dt = DeltaTime(delta);
         }
@@ -105,13 +101,12 @@ impl Game {
             let mut movement_system = MovementSystem { timer };
             movement_system.run_now(&self.world)
         }
-
     }
 
     pub fn render(&mut self) {
         let canvas = &mut self.canvas;
-        canvas.clear();
         canvas.set_draw_color(Color::RGB(30, 50, 80));
+        canvas.clear();
         {
             let mut rendering_system = RenderingSystem { canvas };
             rendering_system.run_now(&self.world);
@@ -120,19 +115,10 @@ impl Game {
     }
 
     pub fn process_input(&mut self) {
-        for event in self.events.poll_iter() {
-            match event {
-                Event::Quit { .. } => {
-                    self.is_running = false;
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => {
-                    self.is_running = false;
-                }
-                _ => {}
-            }
+        let events = &mut self.events;
+        {
+            let mut input_system = InputSystem { events };
+            input_system.run_now(&self.world);
         }
     }
 }

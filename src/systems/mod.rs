@@ -1,5 +1,7 @@
-mod rendering_sytem;
+mod input_system;
 mod movement_system;
+mod rendering_sytem;
 
-pub use rendering_sytem::RenderingSystem;
+pub use input_system::InputSystem;
 pub use movement_system::MovementSystem;
+pub use rendering_sytem::RenderingSystem;

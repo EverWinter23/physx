@@ -1,16 +1,7 @@
-use specs::{
-    Read,
-    Join,
-    System,
-    ReadStorage,
-    WriteStorage,
-};
+use specs::{Join, Read, ReadStorage, System, WriteStorage};
 
+use crate::components::{Position, Velocity};
 use crate::timer::Timer;
-use crate::components::{
-    Position,
-    Velocity,
-};
 
 use crate::game::DeltaTime;
 
@@ -19,7 +10,11 @@ pub struct MovementSystem<'a> {
 }
 
 impl<'a> System<'a> for MovementSystem<'a> {
-    type SystemData = (Read<'a, DeltaTime>, WriteStorage<'a, Position>, ReadStorage<'a, Velocity>);
+    type SystemData = (
+        Read<'a, DeltaTime>,
+        WriteStorage<'a, Position>,
+        ReadStorage<'a, Velocity>,
+    );
 
     fn run(&mut self, data: Self::SystemData) {
         let (delta, mut positions, velocities) = data;
@@ -31,4 +26,3 @@ impl<'a> System<'a> for MovementSystem<'a> {
         }
     }
 }
-

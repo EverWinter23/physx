@@ -11,3 +11,4 @@ specs = { version = "0.17.0", features = ["specs-derive"] }
 [dependencies.sdl2]
 version = "0.35"
 default-features = false
+features = ["gfx"]
