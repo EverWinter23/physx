@@ -6,9 +6,8 @@ use sdl2::EventPump;
 use specs::{Builder, RunNow, World, WorldExt};
 
 use crate::components::{Player, Position, Renderable, Transform, Velocity};
-
-use crate::systems::{InputSystem, MovementSystem, RenderingSystem};
-
+use crate::physx::Vector2;
+use crate::systems::{CollisionSystem, InputSystem, MovementSystem, RenderingSystem};
 use crate::timer::Timer;
 
 #[derive(Default)]
@@ -78,13 +77,39 @@ impl Game {
                 r_width: 10f32,
                 r_height: 10f32,
                 radius: 20f32,
-                scale: 2,
+                scale: 1,
             })
             .with(Renderable {})
-            .with(Position { x: 30f32, y: 30f32 })
-            .with(Velocity { x: 0f32, y: 0f32 })
+            .with(Position{ vec: Vector2::new(30f32, 30f32) })
+            .with(Velocity{ vec: Vector2::new(0f32, 0f32) })
             .build();
-    }
+
+        self.world
+            .create_entity()
+            .with(Transform {
+                r_width: 10f32,
+                r_height: 10f32,
+                radius: 20f32,
+                scale: 1,
+            })
+            .with(Renderable {})
+            .with(Position{ vec: Vector2::new(150f32, 200f32) })
+            .with(Velocity{ vec: Vector2::new(0f32, 0f32) })
+            .build();
+
+        self.world
+            .create_entity()
+            .with(Transform {
+                r_width: 10f32,
+                r_height: 10f32,
+                radius: 20f32,
+                scale: 1,
+            })
+            .with(Renderable {})
+            .with(Position{ vec: Vector2::new(150f32, 300f32) })
+            .with(Velocity{ vec: Vector2::new(0f32, 0f32) })
+            .build();
+   }
 
     pub fn update(&mut self) {
         let (tick, delta) = self.timer.tick();
@@ -100,6 +125,11 @@ impl Game {
         {
             let mut movement_system = MovementSystem { timer };
             movement_system.run_now(&self.world)
+        }
+
+        {
+            let mut collision_system = CollisionSystem { timer };
+            collision_system.run_now(&self.world);
         }
     }
 

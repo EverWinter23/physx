@@ -21,8 +21,8 @@ impl<'a> System<'a> for MovementSystem<'a> {
 
         let delta = delta.0;
         for (position, velocity) in (&mut positions, &velocities).join() {
-            position.x = position.x + velocity.x as f32 * delta;
-            position.y = position.y + velocity.y as f32 * delta;
+            position.vec.x = position.vec.x + velocity.vec.x as f32 * delta;
+            position.vec.y = position.vec.y + velocity.vec.y as f32 * delta;
         }
     }
 }

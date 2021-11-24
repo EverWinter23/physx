@@ -35,7 +35,7 @@ impl Timer {
         self.last_tick = now;
         self.fps += 1;
         if now - self.last_second > 1000 {
-            println!("FPS: {}", self.fps);
+            // println!("FPS: {}", self.fps);
             self.fps = 0;
             self.last_second = now;
         }

@@ -18,56 +18,56 @@ impl<'a> System<'a> for InputSystem<'a> {
 
         let (_, mut velocities) = data;
         let mut players = (&mut velocities).join();
-        let player_velocity = players.next().unwrap();
+        let mut player_velocity = players.next().unwrap();
         for event in self.events.poll_iter() {
             match event {
                 Event::KeyDown {
                     keycode: Some(Keycode::Up),
                     ..
                 } => {
-                    player_velocity.y = -velocity;
+                    player_velocity.vec.y = -velocity;
                 }
                 Event::KeyUp {
                     keycode: Some(Keycode::Up),
                     ..
                 } => {
-                    player_velocity.y = 0f32;
+                    player_velocity.vec.y = 0f32;
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::Down),
                     ..
                 } => {
-                    player_velocity.y = velocity;
+                    player_velocity.vec.y = velocity;
                 }
                 Event::KeyUp {
                     keycode: Some(Keycode::Down),
                     ..
                 } => {
-                    player_velocity.y = 0f32;
+                    player_velocity.vec.y = 0f32;
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::Left),
                     ..
                 } => {
-                    player_velocity.x = -velocity;
+                    player_velocity.vec.x = -velocity;
                 }
                 Event::KeyUp {
                     keycode: Some(Keycode::Left),
                     ..
                 } => {
-                    player_velocity.x = 0f32;
+                    player_velocity.vec.x = 0f32;
                 }
                 Event::KeyDown {
                     keycode: Some(Keycode::Right),
                     ..
                 } => {
-                    player_velocity.x = velocity;
+                    player_velocity.vec.x = velocity;
                 }
                 Event::KeyUp {
                     keycode: Some(Keycode::Right),
                     ..
                 } => {
-                    player_velocity.x = 0f32;
+                    player_velocity.vec.x = 0f32;
                 }
                 Event::Quit { .. } => {}
                 Event::KeyDown {

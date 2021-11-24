@@ -24,9 +24,9 @@ impl<'a> System<'a> for RenderingSystem<'a> {
         self.canvas.set_draw_color(Color::WHITE);
         for (position, transform) in entities.iter() {
             self.canvas
-                .filled_circle(
-                    position.x as i16,
-                    position.y as i16,
+                .circle(
+                    position.vec.x as i16,
+                    position.vec.y as i16,
                     transform.radius as i16,
                     Color::WHITE,
                 )
