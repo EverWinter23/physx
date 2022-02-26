@@ -105,6 +105,7 @@ impl Game {
                 radius: 20f32,
                 scale: 1,
             })
+            .with(Player {})
             .with(Renderable {})
             .with(Position{ vec: Vector2::new(150f32, 300f32) })
             .with(Velocity{ vec: Vector2::new(0f32, 0f32) })
@@ -135,7 +136,7 @@ impl Game {
 
     pub fn render(&mut self) {
         let canvas = &mut self.canvas;
-        canvas.set_draw_color(Color::RGB(30, 50, 80));
+        canvas.set_draw_color(Color::GRAY);
         canvas.clear();
         {
             let mut rendering_system = RenderingSystem { canvas };

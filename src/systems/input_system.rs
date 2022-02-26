@@ -14,11 +14,11 @@ impl<'a> System<'a> for InputSystem<'a> {
     type SystemData = (ReadStorage<'a, Player>, WriteStorage<'a, Velocity>);
 
     fn run(&mut self, data: Self::SystemData) {
-        let velocity = 50f32;
+        let velocity = 80f32;
 
-        let (_, mut velocities) = data;
-        let mut players = (&mut velocities).join();
-        let mut player_velocity = players.next().unwrap();
+        let (players, mut velocities) = data;
+
+        for (_, player_velocity) in (&players, &mut velocities).join() {
         for event in self.events.poll_iter() {
             match event {
                 Event::KeyDown {
@@ -78,6 +78,7 @@ impl<'a> System<'a> for InputSystem<'a> {
                     std::process::exit(0);
                 }
                 _ => {}
+                }
             }
         }
     }
