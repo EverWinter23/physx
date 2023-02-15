@@ -1,4 +1,4 @@
-use crate::components::{Player, Velocity};
+use crate::components::{Player, Position, Velocity, MouseEnd};
 
 use specs::{Join, ReadStorage, System, WriteStorage};
 
@@ -11,63 +11,23 @@ pub struct InputSystem<'a> {
 }
 
 impl<'a> System<'a> for InputSystem<'a> {
-    type SystemData = (ReadStorage<'a, Player>, WriteStorage<'a, Velocity>);
+    type SystemData = (
+        // ReadStorage<'a, Player>,
+        ReadStorage<'a, MouseEnd>,
+        WriteStorage<'a, Velocity>,
+        WriteStorage<'a, Position>,
+    );
 
     fn run(&mut self, data: Self::SystemData) {
-        let velocity = 80f32;
+        let (mouse_ends, mut velocities, mut positions) = data;
 
-        let (players, mut velocities) = data;
+        let mut mouse_end = (&mouse_ends, &mut positions).join().next().unwrap();
 
-        for (_, player_velocity) in (&players, &mut velocities).join() {
         for event in self.events.poll_iter() {
             match event {
-                Event::KeyDown {
-                    keycode: Some(Keycode::Up),
-                    ..
-                } => {
-                    player_velocity.vec.y = -velocity;
-                }
-                Event::KeyUp {
-                    keycode: Some(Keycode::Up),
-                    ..
-                } => {
-                    player_velocity.vec.y = 0f32;
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::Down),
-                    ..
-                } => {
-                    player_velocity.vec.y = velocity;
-                }
-                Event::KeyUp {
-                    keycode: Some(Keycode::Down),
-                    ..
-                } => {
-                    player_velocity.vec.y = 0f32;
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::Left),
-                    ..
-                } => {
-                    player_velocity.vec.x = -velocity;
-                }
-                Event::KeyUp {
-                    keycode: Some(Keycode::Left),
-                    ..
-                } => {
-                    player_velocity.vec.x = 0f32;
-                }
-                Event::KeyDown {
-                    keycode: Some(Keycode::Right),
-                    ..
-                } => {
-                    player_velocity.vec.x = velocity;
-                }
-                Event::KeyUp {
-                    keycode: Some(Keycode::Right),
-                    ..
-                } => {
-                    player_velocity.vec.x = 0f32;
+                Event::MouseMotion { x, y, .. } => {
+                    mouse_end.1.vec.x = x as f32;
+                    mouse_end.1.vec.y = y as f32;
                 }
                 Event::Quit { .. } => {}
                 Event::KeyDown {
@@ -78,7 +38,6 @@ impl<'a> System<'a> for InputSystem<'a> {
                     std::process::exit(0);
                 }
                 _ => {}
-                }
             }
         }
     }

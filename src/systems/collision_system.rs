@@ -1,11 +1,6 @@
-use specs::{
-    Join,
-    ReadStorage,
-    WriteStorage,
-    System,
-};
+use specs::{Join, ReadStorage, System, WriteStorage};
 
-use crate::components::{Transform, Position};
+use crate::components::{Position, Transform};
 use crate::timer::Timer;
 
 use crate::physx::Vector2;
@@ -17,14 +12,14 @@ pub struct CollisionSystem<'a> {
 }
 
 pub fn are_circles_colliding(r1: f32, r2: f32, p1: Vector2, p2: Vector2) -> (bool, Vector2, f32) {
-   let d = r1 + r2;
-   let x = math::distance(p1, p2);
+    let d = r1 + r2;
+    let x = math::distance(p1, p2);
 
-   if x > d {
-       return (false, Vector2::zero(), 0f32);
-   } 
+    if x > d {
+        return (false, Vector2::zero(), 0f32);
+    }
 
-   (true, math::normalize(p2 - p1), d - x)
+    (true, math::normalize(p2 - p1), d - x)
 }
 
 impl<'a> System<'a> for CollisionSystem<'a> {
@@ -38,10 +33,11 @@ impl<'a> System<'a> for CollisionSystem<'a> {
             for j in i + 1..bodies.len() {
                 let (t1, p1) = &bodies[i];
                 let (t2, p2) = &bodies[j];
-                let (collision, normal, depth) =  are_circles_colliding(
-                    t1.radius, t2.radius,
+                let (collision, normal, depth) = are_circles_colliding(
+                    t1.radius,
+                    t2.radius,
                     Vector2::new(p1.vec.x, p1.vec.y),
-                    Vector2::new(p2.vec.x, p2.vec.y)
+                    Vector2::new(p2.vec.x, p2.vec.y),
                 );
 
                 if collision {
